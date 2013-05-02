@@ -21,7 +21,7 @@ func main () {
 	http.Handle("/", http.FileServer(http.Dir("./html")))
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
-		log.Fatalf("omg-compiler listen error on http port 31415: %v", err.Error())
+		log.Fatalf("omg-compiler listen error on http port 80: %v", err.Error())
 	}
 }
 
