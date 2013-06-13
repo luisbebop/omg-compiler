@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 	"log"
-	"code.google.com/p/go.net/websocket"
 	"os/exec"
+	"encoding/json"
 )
 
 // struct to share information with websocket clients
@@ -17,7 +17,7 @@ type CodeS struct {
 func main () {
 	log.Printf("omg-compiler listening websocket and http on port 80")
 	log.Printf("omg-compiler S2 U")
-	http.Handle("/compile", websocket.Handler(Compile))
+	http.Handle("/compile", http.HandlerFunc(Compile))
 	http.Handle("/", http.FileServer(http.Dir("./html")))
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
@@ -25,41 +25,49 @@ func main () {
 	}
 }
 
-// handle a websocket connection received from webserver
-func Compile(ws *websocket.Conn) {
-	log.Printf("compile %#v\n", ws.Config())
-	for {
-		var code CodeS
-		
-		// receives a text message serialized CodeS as JSON.
-		err := websocket.JSON.Receive(ws, &code)
-		if err != nil {
-			log.Printf("%s", err)
-			break
-		}
-		log.Printf("recv:%#v\n", code)
-		
-		// compiling the posxml code
-		if code.Type == "posxml" {
-			err = CallWalkCompiler2(&code)
-			if err != nil {
-				log.Printf("%s", err)
-				break
-			}
-		}
-		
-		// send to the webclients
-		err = websocket.JSON.Send(ws, code)
-		if err != nil {
-			log.Printf("%s", err)
-			break
-		}
-		log.Printf("send:%#v\n", code)
+// handling a POST connection with a variable named doc
+func Compile(w http.ResponseWriter, req *http.Request) {
+	var code CodeS
+	doc := req.FormValue("doc")
+	err := json.Unmarshal([]byte(doc), &code)
+	if err != nil {
+		log.Printf("json.Unmarshal err = %s string = %s", err, doc)
+		return
 	}
+	
+	//compiling the posxml code
+	if code.Type == "posxml" {
+		err = CallWalkCompiler2(&code)
+		if err != nil {
+			log.Printf("CallWalkCompiler err = %s", err)
+			return
+		}
+	}
+	
+	//echo
+	if code.Type == "echo" {
+		err = CallEcho(&code)
+		if err != nil {
+			log.Printf("CallEcho err = %s", err)
+			return
+		}
+	}
+	
+	w.Header().Set("Content-Type", "text/json")
+	w.Write([]byte(code.Output))
 }
 
-func CallWalkCompiler2(c *CodeS) (error){
+func CallWalkCompiler2(c *CodeS) (error) {
 	out, err := exec.Command("WALK_Compiler2.exe", "console", c.Code).Output()
+	if err != nil {
+		return err
+	}
+	c.Output = string(out)
+	return nil
+}
+
+func CallEcho(c * CodeS) (error) {
+	out, err := exec.Command("echo", c.Code).Output()
 	if err != nil {
 		return err
 	}
