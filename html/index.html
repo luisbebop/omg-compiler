@@ -19,17 +19,18 @@
 				left: 1;
 			}
 		</style>
+		
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 	</head>
 	
 	<body>	
 		<div id="editor"></div>
 		<div id="output">
 			<textarea id="txtArea" rows="10" cols="70"></textarea>
-			<input type="button" value="Compile" onClick="CompileOnServer();" />
+			<input type="button" id="btnCompile" value="Compile" />
 		</div>
 			
 		<script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-		
 		<script>
 			//setting ace editor
 		    var editor = ace.edit("editor");
@@ -37,37 +38,26 @@
 		    editor.getSession().setMode("ace/mode/xml");
 			editor.getSession().setValue("<display line=\"0\" column=\"0\" message=\"hello world\"/>");
 		
-			//setting web socket and code struct
-			var codeS = {Type: "posxml", Code: "", Output: ""};
-			var ws;
+			//setting code struct
+			var codeS = {Type: "echo", Code: "", Output: ""};
 			
-			//open a new websocket
-			ws = new WebSocket("ws://walkcompiler.cloudwalk.io/compile");
-				
-			//callback when websocket connects
-			ws.onopen = function() {
-				console.log("ws.onopen()");
-			};
-			
-			//callback when websocket is closed
-			ws.onclose = function (e) {
-  				console.log("ws.onclose()")
-			};
-				
-			//callback when websocket receive a message from the server
-			ws.onmessage = function(e) {
-				console.log("ws.onmessage()");
-				codeS = JSON.parse(e.data);
-				document.getElementById("txtArea").value = codeS.Output;
-			};
-			
-			//get the code on ace and send to websocket
-			function CompileOnServer() {
-				codeS.Code = editor.getSession().getValue();
-				m = JSON.stringify(codeS);
-				document.getElementById("txtArea").value = "compiling ...";
-				ws.send(m);
-			};
+			$(function() {
+				$('#btnCompile').click(function() {
+					document.getElementById("txtArea").value = "compiling ...";
+					codeS.Code = editor.getSession().getValue();
+					
+					$.ajax({
+						type: 'POST',
+						data: { "doc": JSON.stringify(codeS) },
+						success: function(data) {
+							document.getElementById("txtArea").value = data;
+						},
+						error: function(data) {alert('error = ' + data);},
+						url: '/compile',
+						cache: false
+					});
+				});
+			});
 		</script>
 	</body>
 </html>
