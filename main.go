@@ -53,7 +53,7 @@ func Compile(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	
-	w.Header().Set("Content-Type", "text/json")
+	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(code.Output))
 }
 
