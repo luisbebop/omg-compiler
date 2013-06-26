@@ -76,7 +76,7 @@ func CallWalkCompiler2(c *CodeS) (error) {
 }
 
 func CallEcho(c * CodeS) (error) {
-	out, err := exec.Command("echo", c.Code).Output()
+	out, err := exec.Command("cat", c.Code).Output()
 	if err != nil {
 		return err
 	}
