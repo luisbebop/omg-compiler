@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"encoding/json"
+	"io/ioutil"
 )
 
 // struct to share information with websocket clients
@@ -34,6 +35,14 @@ func Compile(w http.ResponseWriter, req *http.Request) {
 		log.Printf("json.Unmarshal err = %s string = %s", err, doc)
 		return
 	}
+	
+	//writing to a tempfile
+	fDoc, _ := ioutil.TempFile("tmp", "doc-")
+	fDoc.WriteString(code.Code)
+	fDoc.Close()
+	
+	//setting the code to filename
+	code.Code = fDoc.Name()
 	
 	//compiling the posxml code
 	if code.Type == "posxml" {

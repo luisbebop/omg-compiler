@@ -32,7 +32,7 @@ func TestCallWalkCompiler2(t *testing.T) {
 	defer ts.Close()
 	
 	values := make(url.Values)
-	values.Set("doc", "{\"Type\":\"posxml\", \"Code\": \"abc\", \"Output\": \"\"}")
+	values.Set("doc", "{\"Type\":\"posxml\", \"Code\": \"<waitkey/>\", \"Output\": \"\"}")
 	r, _ := http.PostForm(ts.URL, values)
 	body, _ := ioutil.ReadAll(r.Body)
 	r.Body.Close()

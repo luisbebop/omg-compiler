@@ -585,13 +585,13 @@
       <xs:element name="downloadfile" type="downloadfile">
         <xs:annotation>
           <!-- ordem dos parametros -->
-          <xs:appinfo>filename,remotepath,deleteafterdownload,variablereturn</xs:appinfo>
+          <xs:appinfo>filename,remotepath,variablereturn</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
           <xs:appinfo>4;true;false;false</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
           <xs:appinfo>
           </xs:appinfo>
-          <xs:documentation>Downloadfile is used to download file from the Walk Server to the terminal's memory.</xs:documentation>
+          <xs:documentation>Downloadfile is used to download a file from WALK Manager to the terminal's memory.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="readfilebyindex" type="readfilebyindex">
@@ -1026,8 +1026,20 @@
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
           <xs:appinfo>
           </xs:appinfo>
-          <xs:documentation>This function waits which a card be read or a key pressed, the time that the instruction will wait is timeout value, if any action happens, the default return values is: keyvariable="KEY_CANCEL", cardvariable="0". Is possible to use this instruction with a EMV card, if the card is a card with chip the instruction 'emv.inittransaction' will be executed
-          </xs:documentation>
+          <xs:documentation>This function waits which a card be read or a key pressed, the time that the instruction will wait is timeout value, if any action happens, the default return values is: keyvariable="KEY_CANCEL", cardvariable="0". Is possible to use this instruction with a EMV card, if the card is a card with chip the instruction 'emv.inittransaction' will be executed </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="system.inputtransaction" type="system.inputtransaction">
+        <xs:annotation>
+          <!-- ordem dos parametros -->
+          <xs:appinfo>keyvariable,cardvariable,timeout,variablereturn,keyboard,inputtype</xs:appinfo>
+          <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
+          <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
+          <xs:appinfo>\x91;true;false;false</xs:appinfo>
+          <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
+          <xs:appinfo>
+          </xs:appinfo>
+          <xs:documentation>This function waits which a card be read or a key pressed, the time that the instruction will wait is timeout value, if any action happens, the default return values is: keyvariable="KEY_CANCEL", cardvariable="0". Is possible to use this instruction with a EMV card or CTLS EMV card, if the card is a card with chip the instruction 'emv.inittransaction' will be executed or CTLS transaction will starts (PINPad 1000 SE CTLS required).</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="network.hostdisconnect" type="network.hostdisconnect">
@@ -1275,13 +1287,25 @@
       <xs:element name="emv.open" type="emv.open">
         <xs:annotation>
           <!-- ordem dos parametros -->
-          <xs:appinfo>variablereturn</xs:appinfo>
+          <xs:appinfo>variablereturn,mkslot,pinpadtype,pinpadwk,showamount</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
           <xs:appinfo>\x2D;true;false;false</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
           <xs:appinfo>
           </xs:appinfo>
           <xs:documentation>Initialize EMV library.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="emv.close" type="emv.close">
+        <xs:annotation>
+          <!-- ordem dos parametros -->
+          <xs:appinfo>variablereturn</xs:appinfo>
+          <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
+          <xs:appinfo>\x22;true;false;false</xs:appinfo>
+          <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
+          <xs:appinfo>
+          </xs:appinfo>
+          <xs:documentation>Finaliza EMV library.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="emv.settimeout" type="emv.settimeout">
@@ -1360,7 +1384,7 @@
       <xs:element name="emv.processtransaction" type="emv.processtransaction">
         <xs:annotation>
           <!-- ordem dos parametros -->
-          <xs:appinfo>variablereturn,mkslot,pinpadtype,pinpadwk,showamount,ctls</xs:appinfo>
+          <xs:appinfo>variablereturn,ctls</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (startelement) -->
           <xs:appinfo>\x3A;true;false;false</xs:appinfo>
           <!-- bytecode;tem parametros;declaracao ou chamada de funcao;declaracao de variavel; (endelement) -->
@@ -2175,12 +2199,7 @@
     </xs:attribute>
     <xs:attribute name="remotepath" type="xs:string" use="required">
       <xs:annotation>
-        <xs:documentation>string (The name of the file that is in the Walk Server downloads's folder. The first character of remotepath must be:  '\')</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="deleteafterdownload" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>integer (0: dont't delete the file of the Walk Server download's folder after download, 1: delete the file of the Walk Server download's folder after download)</xs:documentation>
+        <xs:documentation>(string)File name that is registered on WALK Manager</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="variablereturn" type="xs:string">
@@ -2830,6 +2849,39 @@
       </xs:annotation>
     </xs:attribute>
   </xs:complexType>
+  <xs:complexType name="system.inputtransaction">
+    <xs:sequence />
+    <xs:attribute name="keyvariable" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>string (Key pressed by user. The default keys are: KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_CLEAR, KEY_CANCEL, KEY_ENTER. The optional keys can be: of KEY_EXTRA1 up to KEY_EXTRA99.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cardvariable" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>string (The variable where store card value.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="timeout" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (Time that the instruction will wait.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="variablereturn" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (:0 Pressed key or read card with success. :-1 Error in read card. :-2 The timeout it's over and any action happens. EMV: Card read with sucess: 1, Errors: > 1)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="keyboard" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (:0 Keyboard disable, only KEY_CANCEL return. :1 Keyboard enable, return all keys)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inputtype" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (:1 Banda :2 Chip :3 CTLS :4 Keyboard :5 Touch)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
   <xs:complexType name="network.hostdisconnect">
     <xs:sequence />
   </xs:complexType>
@@ -3243,7 +3295,36 @@
         <xs:documentation>integer (0: OK, 14: Already initialized, 16: Error.)</xs:documentation>
       </xs:annotation>
     </xs:attribute>
+    <xs:attribute name="mkslot" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (Slot of the terminal where is recorded the master key) .</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pinpadtype" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (Type of pinpad utilized, external 2 or internal 1).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pinpadwk" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>string (Working Key used in the session with pinpad) .</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="showamount" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>integer (defines if the library shows amount or not, 1 - show 0 - hide) .</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
+	<xs:complexType name="emv.close">
+		<xs:sequence>
+		</xs:sequence>
+		<xs:attribute name="variablereturn" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>integer (0: OK, >0: Error.)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
   <xs:complexType name="emv.settimeout">
     <xs:sequence />
     <xs:attribute name="seconds" type="xs:string" use="required">
@@ -3328,26 +3409,6 @@
       <xs:annotation>
         <xs:documentation>integer (0: OK, 11: Ivalid parameter, 12: Timeout, 13: Operation PIN entry canceled by user, 15: Library EMV not initialized, 19: Absence of data mandatory for processing, 40: Internal error, 41: Error reading the magnetic stripe, 43: Card is not inserted).
         </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="mkslot" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>integer (Slot of the terminal where is recorded the master key) .</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="pinpadtype" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>integer (Type of pinpad utilized, external 2 or internal 1).</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="pinpadwk" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>string (Working Key used in the session with pinpad) .</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="showamount" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>integer (defines if the library shows amount or not, 1 - show 0 - hide) .</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="ctls" type="xs:string" use="required">
