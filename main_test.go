@@ -9,6 +9,8 @@ import (
 )
 
 func TestCallEcho(t *testing.T) {
+	Tempdir = "tmp"
+	
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Compile(w, r)
 	}))

@@ -9,6 +9,9 @@ import (
 )
 
 func TestCallWalkCompiler2(t *testing.T) {
+	Tempdir = "tmp"
+	PathToWalkCompiler2 = "WALK_Compiler2.exe"
+	
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Compile(w, r)
 	}))
